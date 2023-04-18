@@ -1,9 +1,12 @@
 import os
 import json
-from flask import Flask, render_template
+from flask import Flask, render_template, request, flash
+if os.path.exists("env.py"):
+    import env
 
 
 app = Flask(__name__)          #an instance of flask class and stored in variable called 'app'
+app.secret_key = os.environ.get("SECRET_KEY")
 
 
 @app.route("/")                #using the app.route decorator (@) also called pi notation, will be used to wrap functions as all functions are objects and can be passed around. When we try to browse to the root directory ("/"), the flask triggers the index() function and returns the hello world text.
@@ -30,8 +33,11 @@ def about_member(member_name):
     return render_template("member.html", member=member)
 
 
-@app.route("/contact")
+@app.route("/contact", methods=["GET", "POST"])
 def contact():
+    if request.method == "POST":
+        flash("Thanks {}, we have received your message!".format(
+            request.form.get("name")))
     return render_template("contact.html", page_title="Contact")
 
 
